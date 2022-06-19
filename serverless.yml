@@ -4,7 +4,6 @@ service: strava-data-gen
 
 frameworkVersion: '3'
 
-
 provider:
   name: aws
   runtime: python3.8
