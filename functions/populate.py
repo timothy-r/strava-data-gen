@@ -1,5 +1,4 @@
-
-from lib.StravaService import StravaService
+from lib.Container import Container
 
 """
 * Get all activities
@@ -7,5 +6,9 @@ from lib.StravaService import StravaService
 
 """
 def run(event, context):
-    None
+    
+    strava_service = Container.strava_service
+    
+    # use 0 to indicate all activities
+    activities = strava_service.getActivities(0)
     

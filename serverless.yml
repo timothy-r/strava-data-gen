@@ -4,12 +4,41 @@ service: strava-data-gen
 
 frameworkVersion: '3'
 
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  region: ${opt:region, self:provider.region}
+  webBucket: www.trodger.com
+
+  activitiesTopic: ${self:service}-${self:custom.stage}-activities
+  
+  pythonRequirements:
+    dockerizePip: non-linux
+
 provider:
   name: aws
   runtime: python3.8
   memorySize: 128
   stage: dev
   region: eu-west-2
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - "secretsmanager:*"
+      Resource: "*"
+
+
+  environment:
+
+    SM_SECRET_NAME: StravaAPI
+    SM_ACCESS_TOKEN_NAME: Strava${self:custom.stage}AccessToken
+
+    STRAVA_CLIENT_ID: 73413
+    STRAVA_AUTHZ_URL: "https://www.strava.com/oauth/token"
+    STRAVA_ACTIVITIES_URL: "https://www.strava.com/api/v3/athlete/activities"
+
+    APP_REGION: ${self:custom.region}
+    WEB_BUCKET: ${self:custom.webBucket}
+
 
 functions:
   rateHandler:
@@ -23,11 +52,7 @@ functions:
       # Invoke Lambda function every 2nd minute from Mon-Fri
       - schedule: cron(0/2 * ? * MON-FRI *)
   populate:
-    handler: function/populate.run
+    handler: functions/populate.run
 
 plugins:
   - serverless-python-requirements
-
-custom:
-  pythonRequirements:
-    dockerizePip: non-linux
