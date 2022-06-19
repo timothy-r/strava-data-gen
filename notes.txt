@@ -1,3 +1,6 @@
+From https://www.serverless.com/blog/serverless-python-packaging/
+And https://python-guide-pt-br.readthedocs.io/pt_BR/latest/dev/virtualenvs.html
+
 To enter the python venv use:
 
 source venv/bin/activate
