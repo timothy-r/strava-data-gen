@@ -1,48 +1,15 @@
-<!--
-title: 'AWS Python Scheduled Cron example in Python'
-description: 'This is an example of creating a function that runs as a cron job using the serverless ''schedule'' event.'
-layout: Doc
-framework: v3
-platform: AWS
-language: Python
-priority: 2
-authorLink: 'https://github.com/rupakg'
-authorName: 'Rupak Ganguly'
-authorAvatar: 'https://avatars0.githubusercontent.com/u/8188?v=4&s=140'
--->
+# Strava Report Generator
 
-# Serverless Framework Python Scheduled Cron on AWS
+A serverless application using python3, Dynamo DB, AWS Secrets Manager, SNS & S3
 
-This template demonstrates how to develop and deploy a simple cron-like service running on AWS Lambda using the traditional Serverless Framework.
+Uses activity data from Strava APIs to generate reports for an athlete
+Uses access tokens to authorize access to the APIs
+Runs on a schedule (every hour? TBD) to pull down the latest activities and store them in a DDB table
+All reports are generated from data held in DDB
+Any new activities cause the reports to be re-generated
+Reports are published to a public S3 bucket for presentation
 
-## Schedule event type
-
-This examples defines two functions, `rateHandler` and `cronHandler`, both of which are triggered by an event of `schedule` type, which is used for configuring functions to be executed at specific time or in specific intervals. For detailed information about `schedule` event, please refer to corresponding section of Serverless [docs](https://serverless.com/framework/docs/providers/aws/events/schedule/).
-
-When defining `schedule` events, we need to use `rate` or `cron` expression syntax.
-
-### Rate expressions syntax
-
-```pseudo
-rate(value unit)
-```
-
-`value` - A positive number
-
-`unit` - The unit of time. ( minute | minutes | hour | hours | day | days )
-
-In below example, we use `rate` syntax to define `schedule` event that will trigger our `rateHandler` function every minute
-
-```yml
-functions:
-  rateHandler:
-    handler: handler.run
-    events:
-      - schedule: rate(1 minute)
-```
-
-Detailed information about rate expressions is available in official [AWS docs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#RateExpressions).
-
+Uses docker to build packages compatible with Lambda service
 
 ### Cron expressions syntax
 

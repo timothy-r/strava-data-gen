@@ -1,7 +1,10 @@
 {
   "name": "strava-data-gen",
   "version": "1.0.0",
-  "description": "Example of creating a function that runs as a cron job using the serverless `schedule` event",
+  "description": "Serverless app to produce reports from Strava activity data",
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "serverless-python-requirements": "^5.4.0"
+  }
 }
