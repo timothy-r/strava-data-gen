@@ -1,0 +1,13 @@
+To enter the python venv use:
+
+source venv/bin/activate
+
+Then install packages with:
+
+(venv) $ pip install numpy
+
+(venv) $ pip freeze > requirements.txt
+
+To deploy use:
+
+(venv) $ serverless deploy
