@@ -7,8 +7,7 @@ from .AccessTokenService import AccessTokenService
 from .StravaService import StravaService
 
 """
-DI container for the application
-* add logging service?
+    DI container for the application
 """
 class Container(containers.DeclarativeContainer):
 
@@ -25,13 +24,14 @@ class Container(containers.DeclarativeContainer):
         service_name="dynamodb"
     )
     
-    logger_service = providers.Singleton(
-        logging.getLogger(__name__)
+    logger_service = providers.Callable(
+        logging.getLogger,
+        __name__
     )
     
     access_token_service = providers.Factory(
         AccessTokenService,
-        logger_service,
+        logger=logger_service,
         sm=sm_client,
         client_id=config.strava_client_id,
         secret_name=config.sm_secret_name,
@@ -41,8 +41,8 @@ class Container(containers.DeclarativeContainer):
     
     strava_service = providers.Factory(
         StravaService,
-        logger_service,
-        access_token_service,
+        logger=logger_service,
+        access_token_service=access_token_service,
         activities_url=config.strava_activities_url
     )
     

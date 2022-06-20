@@ -15,9 +15,10 @@ class AccessTokenService:
     
     """
     """
-    def __init__(self, sm, logger, client_id:str, secret_name:str, authz_url:str, access_token_name:str) -> None:
-        self._sm = sm
+    def __init__(self, logger, sm, client_id:str, secret_name:str, authz_url:str, access_token_name:str) -> None:
+       
         self._logger = logger
+        self._sm = sm
         self._client_id = client_id
         self._secret_name = secret_name
         self._authz_url = authz_url
