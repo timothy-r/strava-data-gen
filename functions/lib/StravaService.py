@@ -1,6 +1,7 @@
-from AccessTokenService import AccessTokenService
 import logging
 import requests
+
+from .AccessTokenService import AccessTokenService
 
 """
 * Encapsulates all interactions with Strava APIs
@@ -14,6 +15,7 @@ class StravaService:
     
     def __init__(self, access_token_service: AccessTokenService, activities_url:str) -> None:
         self._access_token_service = access_token_service
+        
         self._activities_url = activities_url
     
     def getAllActivities(self) -> list:
@@ -36,6 +38,7 @@ class StravaService:
 
     def _get_strava_data(self, token: str, after=0) -> dict:
         p = 1
+        results = []
         while True:
             data = self._get_paged_strava_data(token, items_per_page=200, page=p, after=after)
             # test if request failed

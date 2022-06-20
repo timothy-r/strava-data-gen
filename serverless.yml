@@ -30,7 +30,7 @@ provider:
   environment:
 
     SM_SECRET_NAME: StravaAPI
-    SM_ACCESS_TOKEN_NAME: Strava${self:custom.stage}AccessToken
+    SM_ACCESS_TOKEN_NAME: Strava_${self:custom.stage}_AccessToken
 
     STRAVA_CLIENT_ID: 73413
     STRAVA_AUTHZ_URL: "https://www.strava.com/oauth/token"
@@ -44,13 +44,13 @@ functions:
   rateHandler:
     handler: functions/handler.run
     events:
-      # Invoke Lambda function every minute
-      - schedule: rate(1 minute)
-  cronHandler:
-    handler: functions/handler.run
-    events:
-      # Invoke Lambda function every 2nd minute from Mon-Fri
-      - schedule: cron(0/2 * ? * MON-FRI *)
+      # Invoke Lambda function every hour
+      - schedule: rate(1 hour)
+  # cronHandler:
+  #   handler: functions/handler.run
+  #   events:
+  #     # Invoke Lambda function every 30th minute from Mon-Fri
+  #     - schedule: cron(0/30 * ? * MON-FRI *)
   populate:
     handler: functions/populate.run
 
