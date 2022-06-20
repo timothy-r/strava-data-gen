@@ -21,8 +21,9 @@ class StravaService:
         return None
 
     def getActivities(self, after:int) -> list:
-    
-        # get activities from Strava - if authZ fails then get a new access token & try again
+        """
+            get activities from Strava - if authZ fails then get a new access token & try again
+        """
         try:
             # get access token (use local one if possible)
             token = self._access_token_service.get_access_token(True)
@@ -49,7 +50,7 @@ class StravaService:
         while True:
             data = self._get_paged_strava_data(token, items_per_page=200, page=p, after=after)
             
-            self._logger.info("page {} has {} items".format(p, len(data)))
+            # self._logger.info("page {} has {} items".format(p, len(data)))
             p += 1
             if len(data) == 0:
                 break

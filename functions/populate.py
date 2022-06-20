@@ -24,5 +24,13 @@ def run(event, context):
     logger.info("Number of activities: {}".format(len(activities)))
     
     # store the activities in DDB
+    ddb_service = container.ddb_service()
     
+    # make sure the table exists & is read for writes    
+    ddb_service.ensure_table_exists()
+    
+    for activity in activities:
+        key = ddb_service.generate_key(activity)
+        ddb_service.store_item(key=key, item=activity)
+        
     # publish an event to indicate new activities

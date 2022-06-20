@@ -90,7 +90,7 @@ class AccessTokenService:
         response = requests.post(
             self._authz_url,
             data=payload, 
-            verify=False
+            verify=True
         )
         
         if response.status_code == 200:

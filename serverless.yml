@@ -25,7 +25,10 @@ provider:
       Action:
         - "secretsmanager:*"
       Resource: "*"
-
+    - Effect: Allow
+      Action:
+        - "dynamodb:*"
+      Resource: "*"
 
   environment:
 

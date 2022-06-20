@@ -3,6 +3,8 @@ from dependency_injector import containers, providers
 import boto3
 import logging
 
+# import requests
+
 from .AccessTokenService import AccessTokenService
 from .StravaService import StravaService
 from .DDBService import DDBService
@@ -30,11 +32,16 @@ class Container(containers.DeclarativeContainer):
         __name__
     )
     
+    # provide the requests object to clients
+    # requests_service = providers.Object(
+    #     requests
+    # )
+    
     ddb_service = providers.Factory(
         DDBService,
         logger=logger_service,
         ddb_client=ddb_client,
-        table_name=config.ddd_table_name
+        table_name=config.ddb_table_name
     )
     
     access_token_service = providers.Factory(
