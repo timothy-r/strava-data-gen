@@ -1,4 +1,3 @@
-import logging
 import requests
 
 from .AccessTokenService import AccessTokenService
@@ -8,14 +7,12 @@ from .AccessTokenService import AccessTokenService
 * Handles authorisation internally
 """
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
 class StravaService:
     
     # comment
-    def __init__(self, access_token_service: AccessTokenService, activities_url:str) -> None:
+    def __init__(self, logger, access_token_service: AccessTokenService, activities_url:str) -> None:
         self._access_token_service = access_token_service
+        self._logger = logger
         self._activities_url = activities_url
 
         return None
@@ -25,7 +22,7 @@ class StravaService:
         # get access token (use local one if possible)
         token = self._access_token_service.get_access_token(True)
         
-        logger.info("Access token {}".format(token))
+        self._logger.info("Access token {}".format(token))
         
         # get activities from Strava - if authZ fails then get a new access token & try again
         # in a loop request all activities since the 'since' param
@@ -42,7 +39,7 @@ class StravaService:
             data = self._get_paged_strava_data(token, items_per_page=200, page=p, after=after)
             # test if request failed
             
-            logger.info("page {} has {} items".format(p, len(data)))
+            self._logger.info("page {} has {} items".format(p, len(data)))
             p += 1
             if len(data) == 0:
                 break

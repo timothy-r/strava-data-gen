@@ -1,7 +1,7 @@
 from dependency_injector import containers, providers
-# from dependency_injector.wiring import Provide, inject
+
 import boto3
-# import os 
+import logging
 
 from .AccessTokenService import AccessTokenService
 from .StravaService import StravaService
@@ -25,9 +25,13 @@ class Container(containers.DeclarativeContainer):
         service_name="dynamodb"
     )
     
+    logger_service = providers.Singleton(
+        logging.getLogger(__name__)
+    )
     
     access_token_service = providers.Factory(
         AccessTokenService,
+        logger_service,
         sm=sm_client,
         client_id=config.strava_client_id,
         secret_name=config.sm_secret_name,
@@ -37,6 +41,7 @@ class Container(containers.DeclarativeContainer):
     
     strava_service = providers.Factory(
         StravaService,
+        logger_service,
         access_token_service,
         activities_url=config.strava_activities_url
     )
