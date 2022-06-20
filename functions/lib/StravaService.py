@@ -13,14 +13,13 @@ logger.setLevel(logging.INFO)
 
 class StravaService:
     
+    # comment
     def __init__(self, access_token_service: AccessTokenService, activities_url:str) -> None:
         self._access_token_service = access_token_service
-        
         self._activities_url = activities_url
-    
-    def getAllActivities(self) -> list:
-        return []
-    
+
+        return None
+
     def getActivities(self, after:int) -> list:
         
         # get access token (use local one if possible)

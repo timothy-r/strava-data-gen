@@ -44,14 +44,10 @@ functions:
   rateHandler:
     handler: functions/handler.run
     events:
-      # Invoke Lambda function every hour
+      # Invoke Lambda function every hour - really want this between 8am & 8pm 
       - schedule: rate(1 hour)
-  # cronHandler:
-  #   handler: functions/handler.run
-  #   events:
-  #     # Invoke Lambda function every 30th minute from Mon-Fri
-  #     - schedule: cron(0/30 * ? * MON-FRI *)
   populate:
+    timeout: 60
     handler: functions/populate.run
 
 plugins:

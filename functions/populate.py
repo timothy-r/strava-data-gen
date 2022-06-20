@@ -25,3 +25,7 @@ def run(event, context):
     # use 0 to indicate all activities
     activities = strava_service.getActivities(0)
     logger.info("Number of activities: {}".format(len(activities)))
+    
+    # store the activities in DDB
+    
+    # publish an event to indicate new activities

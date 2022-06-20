@@ -36,7 +36,7 @@ class AccessTokenService:
     def get_access_token(self, useLocal=True) -> str:
         # get secrets: client_secret, refresh_token, access_token
         if useLocal:
-            token_data = self._get_secrets(self._access_token_name)()
+            token_data = self._get_secrets(self._access_token_name)
             if token_data:
                 logger.info("Using local token")
                 return token_data['token']
@@ -52,20 +52,6 @@ class AccessTokenService:
             
         return token 
     
-    # def _get_stored_access_token(self) -> str:
-    #     # wrap in try catch block
-    #     try:
-    #         secret_data = self._sm.get_secret_value(SecretId=self._access_token_name)
-    #         if 'SecretString' in secret_data:
-    #             return json.loads(secret_data['SecretString'])
-    #         else:
-    #             return None
-            
-    #     except ClientError as err:
-    #         # if the secret does't exist an exception is thrown
-    #         logger.info("Failed to get access token from SM {}".format(err))
-    #         return None
-        
     def _set_stored_access_token(self, token_data:dict) -> bool:
         data = json.dumps(token_data)
         try:
