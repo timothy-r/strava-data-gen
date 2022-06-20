@@ -1,6 +1,7 @@
 import requests
 import json
 
+from .AppExceptions import RequestError
 from botocore.exceptions import ClientError
 
 """
@@ -35,13 +36,14 @@ class AccessTokenService:
         # get a new access token
         token = self._request_access_token()
 
-        self._logger.info("Got new token")
-        
         # only store the token if it exists, on failure store nothing
         if token:
+            self._logger.info("Got new token")
             self._set_stored_access_token({'token': token})
-            
-        return token 
+            return token 
+        else:
+            return None
+        
     
     def _set_stored_access_token(self, token_data:dict) -> bool:
         data = json.dumps(token_data)
@@ -85,9 +87,13 @@ class AccessTokenService:
             'f': 'json'
         }
         
-        return requests.post(
+        response = requests.post(
             self._authz_url,
             data=payload, 
             verify=False
-        ).json()['access_token']
+        )
         
+        if response.status_code == 200:
+            return response.json()['access_token']
+        else:
+            raise RequestError("Request failed: {}".format(response.status_code))

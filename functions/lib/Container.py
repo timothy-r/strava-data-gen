@@ -5,6 +5,7 @@ import logging
 
 from .AccessTokenService import AccessTokenService
 from .StravaService import StravaService
+from .DDBService import DDBService
 
 """
     DI container for the application
@@ -27,6 +28,13 @@ class Container(containers.DeclarativeContainer):
     logger_service = providers.Callable(
         logging.getLogger,
         __name__
+    )
+    
+    ddb_service = providers.Factory(
+        DDBService,
+        logger=logger_service,
+        ddb_client=ddb_client,
+        table_name=config.ddd_table_name
     )
     
     access_token_service = providers.Factory(
@@ -59,6 +67,8 @@ def getContainer():
 
     container.config.app_region.from_env("APP_REGION", required=True)
 
+    container.config.ddb_table_name.from_env("DDB_TABLE_NAME", required=True)
+    
     container.init_resources()
     
     return container

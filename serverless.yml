@@ -36,6 +36,8 @@ provider:
     STRAVA_AUTHZ_URL: "https://www.strava.com/oauth/token"
     STRAVA_ACTIVITIES_URL: "https://www.strava.com/api/v3/athlete/activities"
 
+    DDB_TABLE_NAME: ${self:service}-${self:custom.stage}-activities-table
+
     APP_REGION: ${self:custom.region}
     WEB_BUCKET: ${self:custom.webBucket}
 

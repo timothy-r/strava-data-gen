@@ -1,14 +1,8 @@
 'use strict';
 
-from dependency_injector.wiring import Provide, inject
-import logging
-import os 
+# from dependency_injector.wiring import Provide, inject
 
 from lib.Container import getContainer
-
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 
 """
@@ -22,8 +16,11 @@ def run(event, context):
     
     strava_service = container.strava_service()
     
+    logger = container.logger_service()
+    
     # use 0 to indicate all activities
     activities = strava_service.getActivities(0)
+    
     logger.info("Number of activities: {}".format(len(activities)))
     
     # store the activities in DDB
