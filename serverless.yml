@@ -7,7 +7,10 @@ frameworkVersion: '3'
 custom:
   stage: ${opt:stage, self:provider.stage}
   region: ${opt:region, self:provider.region}
+  
   webBucket: www.trodger.com
+
+  dataStoreBucket: ${self:service}-${self.custom.stage}-activities-data-store
 
   activitiesTopic: ${self:service}-${self:custom.stage}-activities
   
@@ -25,10 +28,10 @@ provider:
       Action:
         - "secretsmanager:*"
       Resource: "*"
-    - Effect: Allow
-      Action:
-        - "dynamodb:*"
-      Resource: "*"
+    # - Effect: Allow
+    #   Action:
+    #     - "dynamodb:*"
+    #   Resource: "*"
 
   environment:
 
@@ -43,7 +46,7 @@ provider:
 
     APP_REGION: ${self:custom.region}
     WEB_BUCKET: ${self:custom.webBucket}
-
+    DATA_STORE_BUCKET: ${self.custom.dataStoreBucket}
 
 functions:
   rateHandler:

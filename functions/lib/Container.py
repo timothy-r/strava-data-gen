@@ -3,11 +3,10 @@ from dependency_injector import containers, providers
 import boto3
 import logging
 
-# import requests
-
 from .AccessTokenService import AccessTokenService
 from .StravaService import StravaService
 from .DDBService import DDBService
+from .DataStoreService import DataStoreService
 
 """
     DI container for the application
@@ -32,6 +31,11 @@ class Container(containers.DeclarativeContainer):
         __name__
     )
     
+    s3_client = providers.Singleton(
+        boto3.client,
+        service_name='s3'
+    )
+    
     # provide the requests object to clients
     # requests_service = providers.Object(
     #     requests
@@ -42,6 +46,13 @@ class Container(containers.DeclarativeContainer):
         logger=logger_service,
         ddb_client=ddb_client,
         table_name=config.ddb_table_name
+    )
+    
+    data_store_service = providers.Factory(
+        DataStoreService,
+        logger=logger_service,
+        s3_client=s3_client,
+        bucket=config.data_store_bucket
     )
     
     access_token_service = providers.Factory(
@@ -61,7 +72,7 @@ class Container(containers.DeclarativeContainer):
         activities_url=config.strava_activities_url
     )
     
-def getContainer():
+def get_container():
     
     container = Container()
 
@@ -75,6 +86,8 @@ def getContainer():
     container.config.app_region.from_env("APP_REGION", required=True)
 
     container.config.ddb_table_name.from_env("DDB_TABLE_NAME", required=True)
+    
+    container.config.data_store_bucket.from_env("DATA_STORE_BUCKET", required=True)
     
     container.init_resources()
     

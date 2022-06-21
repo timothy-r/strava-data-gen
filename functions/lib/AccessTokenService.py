@@ -17,7 +17,7 @@ class AccessTokenService:
     """
     """
     def __init__(self, logger, sm, client_id:str, secret_name:str, authz_url:str, access_token_name:str) -> None:
-       
+        
         self._logger = logger
         self._sm = sm
         self._client_id = client_id
@@ -27,6 +27,7 @@ class AccessTokenService:
         return None
     
     def get_access_token(self, useLocal=True) -> str:
+        
         if useLocal:
             token_data = self._get_secrets(self._access_token_name)
             if token_data:

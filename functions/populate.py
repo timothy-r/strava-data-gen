@@ -1,9 +1,6 @@
 'use strict';
 
-# from dependency_injector.wiring import Provide, inject
-
-from lib.Container import getContainer
-
+from lib.Container import get_container
 
 """
 * Get all activities
@@ -12,25 +9,24 @@ from lib.Container import getContainer
 """
 def run(event, context):
     
-    container = getContainer()
+    container = get_container()
     
     strava_service = container.strava_service()
     
     logger = container.logger_service()
     
     # use 0 to indicate all activities
-    activities = strava_service.getActivities(0)
+    activities = strava_service.get_activities(after=0)
     
-    logger.info("Number of activities: {}".format(len(activities)))
+    logger.info("Number of retrieved activities: {}".format(len(activities)))
     
-    # store the activities in DDB
-    ddb_service = container.ddb_service()
+    # store the new activities in data store
+    data_store = container.data_store_service()
     
-    # make sure the table exists & is read for writes    
-    ddb_service.ensure_table_exists()
+    new_activities = data_store.add_new_activities(activities=activities)
     
-    for activity in activities:
-        key = ddb_service.generate_key(activity)
-        ddb_service.store_item(key=key, item=activity)
-        
-    # publish an event to indicate new activities
+    logger.info("Number of new activities: {}".format(new_activities))
+    
+    if new_activities > 0:
+        pass
+        # publish an event to indicate new activities

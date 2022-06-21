@@ -20,7 +20,7 @@ class StravaService:
 
         return None
 
-    def getActivities(self, after:int) -> list:
+    def get_activities(self, after:int) -> list:
         """
             get activities from Strava - if authZ fails then get a new access token & try again
         """
