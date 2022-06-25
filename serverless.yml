@@ -71,9 +71,12 @@ functions:
     timeout: 60
     handler: functions/populate.run
 
-  # reportHeartRate:
-  #   timeout: 60
-  #   handler: functions/reportHeartRate.run
+  reportHeartRate:
+    timeout: 60
+    handler: functions/reportHeartRate.run
+    events:
+      - sns: 
+          topicName: ${self:custom.activitiesTopic}
 
 plugins:
   - serverless-python-requirements

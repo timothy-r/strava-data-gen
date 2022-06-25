@@ -4,6 +4,7 @@ import boto3
 import logging
 
 from functions.lib.DataPopulateService import DataPopulateService
+from functions.lib.HeartRateReporter import HeartRateReporter
 
 from .AccessTokenService import AccessTokenService
 from .StravaService import StravaService
@@ -67,6 +68,10 @@ class Container(containers.DeclarativeContainer):
         logger=logger_service,
         strava_service=strava_service,
         data_store_service=data_store_service
+    )
+    
+    heart_rate_reporter = providers.Factory(
+        HeartRateReporter
     )
     
 def get_container():
