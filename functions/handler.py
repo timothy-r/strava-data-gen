@@ -1,11 +1,26 @@
-import datetime
-import logging
+from lib.Container import get_container
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+import time
 
+"""
+* Get all data from the last 2 hours
+* Add all activities to data store 
+
+"""
 
 def run(event, context):
-    current_time = datetime.datetime.now().time()
-    name = context.function_name
-    logger.info("Your cron function " + name + " ran at " + str(current_time))
+    container = get_container()
+    
+    data_populate_service = container.data_store_service
+    
+    # get all data from the last 4 hours (testing)
+    after = time.time() - (4 * 60 * 60)
+    new_activities = data_populate_service.update(after)
+    
+    if new_activities > 0:
+        pass
+        # publish an event to indicate new activities
+        
+    # current_time = datetime.datetime.now().time()
+    # name = context.function_name
+    # logger.info("Your cron function " + name + " ran at " + str(current_time))

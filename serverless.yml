@@ -47,13 +47,6 @@ provider:
       Resource:
         - { "Fn::Join": ["", ["arn:aws:s3:::", "${self:custom.dataStoreBucket}", "/*" ] ]  }
 
-    # - Effect: Allow
-    #   Action:
-    #     - "s3:*"
-    #   Resource:
-    #     - { "Fn::Join": ["", ["arn:aws:s3::", ":${self:custom.dataStoreBucket}", "/*" ] ]  }
-
-
   environment:
 
     SM_SECRET_NAME: StravaAPI
@@ -69,6 +62,7 @@ provider:
 
 functions:
   rateHandler:
+    timeout: 60
     handler: functions/handler.run
     events:
       # Invoke Lambda function every hour - really want this between 8am & 8pm 
