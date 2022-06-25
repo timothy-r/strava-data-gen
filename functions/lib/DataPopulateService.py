@@ -8,7 +8,7 @@ class DataPopulateService:
     def __init__(self, logger, strava_service, data_store_service) -> None:
         self._logger = logger
         self._strava_service = strava_service
-        self.data_store_service = data_store_service
+        self._data_store_service = data_store_service
 
     def update(self, after):
         """
