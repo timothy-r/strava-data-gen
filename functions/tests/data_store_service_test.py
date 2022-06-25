@@ -1,8 +1,8 @@
-import random
 import unittest
 from unittest.mock import Mock
 from unittest.mock import MagicMock
 import json
+import botocore.exceptions
 
 from lib.DataStoreService import DataStoreService
 
@@ -20,7 +20,8 @@ class DataStoreServiceTest(unittest.TestCase):
         self._data_store = DataStoreService(
             logger=logger_mock, 
             s3_client=self._s3_client_mock,
-            bucket=self._test_bucket_name
+            bucket=self._test_bucket_name,
+            region='eu-west-2'
             )
         
         return super().setUp()
@@ -43,7 +44,7 @@ class DataStoreServiceTest(unittest.TestCase):
         
         existing_activity_data = get_activity_data([99887, 333112])
         mock_get_object = MagicMock()
-        mock_get_object.return_value = json.dumps(existing_activity_data)
+        mock_get_object.return_value = existing_activity_data
         self._s3_client_mock.get_object = mock_get_object
         
         all_activities = self._data_store.get_all_activities()
@@ -58,7 +59,7 @@ class DataStoreServiceTest(unittest.TestCase):
         
         existing_activity_data = get_activity_data(ids)
         mock_get_object = MagicMock()
-        mock_get_object.return_value = json.dumps(existing_activity_data)
+        mock_get_object.return_value = existing_activity_data
         self._s3_client_mock.get_object = mock_get_object
         
         # data format returned by Strava APIs is a list of dicts
@@ -74,7 +75,7 @@ class DataStoreServiceTest(unittest.TestCase):
         
         existing_activity_data = get_activity_data(ids)
         mock_get_object = MagicMock()
-        mock_get_object.return_value = json.dumps(existing_activity_data)
+        mock_get_object.return_value = existing_activity_data
         self._s3_client_mock.get_object = mock_get_object
         
         mock_put_object = MagicMock()
@@ -94,7 +95,40 @@ class DataStoreServiceTest(unittest.TestCase):
         assert (1 == len(calls))
         # assert (self._test_bucket_name == calls[0]['Bucket'])
     
-    
+    def test_ensure_bucket_exists_creates_bucket(self):
+        """
+            Test that the data store creates a bucket when it doesn't exist
+        """
+        head_bucket_mock = MagicMock(side_effect=get_missing_bucket_exception)
+        self._s3_client_mock.head_bucket = head_bucket_mock
+        
+        create_bucket_mock = MagicMock()
+        self._s3_client_mock.create_bucket = create_bucket_mock
+        
+        self._data_store.ensure_bucket_exists()
+        
+        assert(1 ==  len(head_bucket_mock.mock_calls))
+        assert(1 == len(create_bucket_mock.mock_calls))
+
+    def test_ensure_bucket_exists(self):
+        
+        head_bucket_mock = MagicMock()
+        self._s3_client_mock.head_bucket = head_bucket_mock
+        
+        create_bucket_mock = MagicMock()
+        self._s3_client_mock.create_bucket = create_bucket_mock
+        
+        self._data_store.ensure_bucket_exists()
+        
+        assert(1 ==  len(head_bucket_mock.mock_calls))
+        assert(0 == len(create_bucket_mock.mock_calls))
+
+
+
+def get_missing_bucket_exception(Bucket):
+    e = botocore.exceptions.ClientError(error_response={}, operation_name="Missing")
+    raise e
+
 def get_list_objects_v2_empty_response(bucket_name):
         """
             an empty bucket response
@@ -174,7 +208,9 @@ def get_activity_data(ids:list) -> str:
         key = 'activity:{}:athlete:{}'.format(id, activity['athlete']['id'])
         data[key] = activity
         
-    return data
+    return {
+        'Body': data
+    }
 
 def get_single_activity(id) -> dict:
     """

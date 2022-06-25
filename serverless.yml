@@ -10,7 +10,7 @@ custom:
   
   webBucket: www.trodger.com
 
-  dataStoreBucket: ${self:service}-${self.custom.stage}-activities-data-store
+  dataStoreBucket: ${self:service}-${self:custom.stage}-activities-data-store
 
   activitiesTopic: ${self:service}-${self:custom.stage}-activities
   
@@ -28,10 +28,31 @@ provider:
       Action:
         - "secretsmanager:*"
       Resource: "*"
+
+    - Effect: Allow
+      Action: 's3:ListBucket'
+      Resource: '*'
+
+    - Effect: Allow
+      Action: 's3:CreateBucket'
+      Resource: '*'
+
+    - Effect: Allow
+      Action: 's3:PutObject'
+      Resource:
+        - { "Fn::Join": ["", ["arn:aws:s3:::", "${self:custom.dataStoreBucket}", "/*" ] ]  }
+
+    - Effect: Allow
+      Action: 's3:GetObject'
+      Resource:
+        - { "Fn::Join": ["", ["arn:aws:s3:::", "${self:custom.dataStoreBucket}", "/*" ] ]  }
+
     # - Effect: Allow
     #   Action:
-    #     - "dynamodb:*"
-    #   Resource: "*"
+    #     - "s3:*"
+    #   Resource:
+    #     - { "Fn::Join": ["", ["arn:aws:s3::", ":${self:custom.dataStoreBucket}", "/*" ] ]  }
+
 
   environment:
 
@@ -42,11 +63,9 @@ provider:
     STRAVA_AUTHZ_URL: "https://www.strava.com/oauth/token"
     STRAVA_ACTIVITIES_URL: "https://www.strava.com/api/v3/athlete/activities"
 
-    DDB_TABLE_NAME: ${self:service}-${self:custom.stage}-activities-table
-
     APP_REGION: ${self:custom.region}
     WEB_BUCKET: ${self:custom.webBucket}
-    DATA_STORE_BUCKET: ${self.custom.dataStoreBucket}
+    DATA_STORE_BUCKET: ${self:custom.dataStoreBucket}
 
 functions:
   rateHandler:
@@ -57,6 +76,10 @@ functions:
   populate:
     timeout: 60
     handler: functions/populate.run
+
+  # reportHR:
+  #   timeout: 60
+  #   handler: functions/reportHR.run
 
 plugins:
   - serverless-python-requirements

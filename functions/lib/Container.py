@@ -5,7 +5,6 @@ import logging
 
 from .AccessTokenService import AccessTokenService
 from .StravaService import StravaService
-from .DDBService import DDBService
 from .DataStoreService import DataStoreService
 
 """
@@ -19,11 +18,6 @@ class Container(containers.DeclarativeContainer):
     sm_client = providers.Singleton(
         boto3.client,
         service_name="secretsmanager"
-    )
-    
-    ddb_client = providers.Singleton(
-        boto3.client,
-        service_name="dynamodb"
     )
     
     logger_service = providers.Callable(
@@ -41,18 +35,12 @@ class Container(containers.DeclarativeContainer):
     #     requests
     # )
     
-    ddb_service = providers.Factory(
-        DDBService,
-        logger=logger_service,
-        ddb_client=ddb_client,
-        table_name=config.ddb_table_name
-    )
-    
     data_store_service = providers.Factory(
         DataStoreService,
         logger=logger_service,
         s3_client=s3_client,
-        bucket=config.data_store_bucket
+        bucket=config.data_store_bucket,
+        region=config.app_region
     )
     
     access_token_service = providers.Factory(
@@ -85,10 +73,10 @@ def get_container():
 
     container.config.app_region.from_env("APP_REGION", required=True)
 
-    container.config.ddb_table_name.from_env("DDB_TABLE_NAME", required=True)
-    
     container.config.data_store_bucket.from_env("DATA_STORE_BUCKET", required=True)
     
     container.init_resources()
+    
+    container.logger_service().setLevel(logging.DEBUG)
     
     return container

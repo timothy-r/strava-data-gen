@@ -23,6 +23,8 @@ def run(event, context):
     # store the new activities in data store
     data_store = container.data_store_service()
     
+    data_store.ensure_bucket_exists()
+    
     new_activities = data_store.add_new_activities(activities=activities)
     
     logger.info("Number of new activities: {}".format(new_activities))
