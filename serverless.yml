@@ -71,9 +71,9 @@ functions:
     timeout: 60
     handler: functions/populate.run
 
-  # reportHR:
+  # reportHeartRate:
   #   timeout: 60
-  #   handler: functions/reportHR.run
+  #   handler: functions/reportHeartRate.run
 
 plugins:
   - serverless-python-requirements
