@@ -21,6 +21,3 @@ def run(event, context):
         pass
         # publish an event to indicate new activities
         
-    # current_time = datetime.datetime.now().time()
-    # name = context.function_name
-    # logger.info("Your cron function " + name + " ran at " + str(current_time))
