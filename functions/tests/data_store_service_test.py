@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import Mock
 from unittest.mock import MagicMock
-import json
 import botocore.exceptions
+import json
 
 from lib.DataStoreService import DataStoreService
 
@@ -43,9 +43,8 @@ class DataStoreServiceTest(unittest.TestCase):
         self._s3_client_mock.list_objects_v2 = MagicMock(side_effect=get_all_activities_mock)
         
         existing_activity_data = get_activity_data([99887, 333112])
-        mock_get_object = MagicMock()
-        mock_get_object.return_value = existing_activity_data
-        self._s3_client_mock.get_object = mock_get_object
+        
+        self._s3_client_mock.get_object = generate_mocked_get_object(existing_activity_data)
         
         all_activities = self._data_store.get_all_activities()
         assert(len(all_activities) == 2)
@@ -58,9 +57,7 @@ class DataStoreServiceTest(unittest.TestCase):
         self._s3_client_mock.list_objects_v2 = MagicMock(side_effect=get_all_activities_mock)
         
         existing_activity_data = get_activity_data(ids)
-        mock_get_object = MagicMock()
-        mock_get_object.return_value = existing_activity_data
-        self._s3_client_mock.get_object = mock_get_object
+        self._s3_client_mock.get_object = generate_mocked_get_object(existing_activity_data)
         
         # data format returned by Strava APIs is a list of dicts
         # data store service generates unique ids for each activity
@@ -74,9 +71,7 @@ class DataStoreServiceTest(unittest.TestCase):
         self._s3_client_mock.list_objects_v2 = MagicMock(side_effect=get_all_activities_mock)
         
         existing_activity_data = get_activity_data(ids)
-        mock_get_object = MagicMock()
-        mock_get_object.return_value = existing_activity_data
-        self._s3_client_mock.get_object = mock_get_object
+        self._s3_client_mock.get_object = generate_mocked_get_object(existing_activity_data)
         
         mock_put_object = MagicMock()
         self._s3_client_mock.put_object = mock_put_object
@@ -207,9 +202,11 @@ def get_activity_data(ids:list) -> str:
         activity = get_single_activity(id)
         key = 'activity:{}:athlete:{}'.format(id, activity['athlete']['id'])
         data[key] = activity
-        
+    
+    return data
+
     return {
-        'Body': data
+        'Body': MockStream(data)
     }
 
 def get_single_activity(id) -> dict:
@@ -276,3 +273,14 @@ def get_single_activity(id) -> dict:
         "has_kudoed": False,
         "suffer_score": 2.0
     }
+
+def generate_mocked_get_object(data):
+    mock_stream = Mock()
+    mock_stream_read = MagicMock()
+    mock_stream_read.return_value = json.dumps(data)
+    mock_stream.read = mock_stream_read
+    
+    mock_get_object = MagicMock()
+    mock_get_object.return_value = {'Body': mock_stream}
+    
+    return mock_get_object
