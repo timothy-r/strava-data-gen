@@ -11,7 +11,7 @@ import time
 def run(event, context):
     container = get_container()
     
-    data_populate_service = container.data_store_service
+    data_populate_service = container.data_store_service()
     
     # get all data from the last 4 hours (testing)
     after = time.time() - (4 * 60 * 60)
