@@ -3,31 +3,23 @@
 from lib.Container import get_container
 
 """
-* Get all activities
-* Add all activities to DDB table
+* Get all activities from Strava
+* Add all activities to data store 
 
 """
 def run(event, context):
     
     container = get_container()
     
-    strava_service = container.strava_service()
+    data_store_service = container.data_store_service
     
-    logger = container.logger_service()
+    # as part of set up ensure the bucket has been created
+    data_store_service.ensure_bucket_exists()
     
-    # use 0 to indicate all activities
-    activities = strava_service.get_activities(after=0)
+    data_populate_service = container.data_store_service
     
-    logger.info("Number of retrieved activities: {}".format(len(activities)))
-    
-    # store the new activities in data store
-    data_store = container.data_store_service()
-    
-    data_store.ensure_bucket_exists()
-    
-    new_activities = data_store.add_new_activities(activities=activities)
-    
-    logger.info("Number of new activities: {}".format(new_activities))
+    # get all data from 0 epoch time
+    new_activities = data_populate_service.update(0)
     
     if new_activities > 0:
         pass

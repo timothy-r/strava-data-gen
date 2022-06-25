@@ -3,6 +3,8 @@ from dependency_injector import containers, providers
 import boto3
 import logging
 
+from functions.lib.DataPopulateService import DataPopulateService
+
 from .AccessTokenService import AccessTokenService
 from .StravaService import StravaService
 from .DataStoreService import DataStoreService
@@ -58,6 +60,13 @@ class Container(containers.DeclarativeContainer):
         logger=logger_service,
         access_token_service=access_token_service,
         activities_url=config.strava_activities_url
+    )
+    
+    data_populate_service = providers.Factory(
+        DataPopulateService,
+        logger=logger_service,
+        strava_service=strava_service,
+        data_store_service=data_store_service
     )
     
 def get_container():
