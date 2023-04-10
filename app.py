@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, make_response
+from flask import Flask, jsonify, make_response, request
 
 app = Flask(__name__)
 
@@ -18,22 +18,30 @@ def update():
 #     }
 # }
     pass
-    # return jsonify(message='Hello from root!')
 
 @app.route("/activity", methods=['GET'])
 def subscribe():
     # Example request to confirm subscription
     # GET https://mycallbackurl.com?hub.verify_token=STRAVA&hub.challenge=15f7d1a91c1f40f8a748fd134752feb3&hub.mode=subscribe
-
-    pass
-    # return jsonify(message='Hello from root!')
-
+    
+    # authorize hub.verify_token request parameter
+    verify_token = request.args.get('hub.verify_token', '')
+    # validate this token
+    
+    if request.args.get('hub.mode', '') == 'subscribe':
+        challenge = request.args.get('hub.challenge', '')
+        # echo this back to the HTTP client in the response
+        return jsonify({'hub.challenge' : challenge})
+    else:
+        return jsonify(message='Invalid request')
 
 @app.route("/populate")
-def hello():
+def populate():
+    # authorize hub.verify_token request parameter
+    verify_token = request.args.get('hub.verify_token', '')
+    
     # get all activities
     pass
-    # return jsonify(message='Hello from path!')
 
 
 @app.errorhandler(404)
