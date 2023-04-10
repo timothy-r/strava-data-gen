@@ -3,7 +3,7 @@ from datetime import datetime
 from time import strftime
 import botocore.exceptions
 
-from lib.DateTimeEncoder import DateTimeEncoder
+from functions.lib.date_time_encoder import DateTimeEncoder
 
 """
     Encapsulates reading & writing & updating activity data

@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import Mock
 from unittest.mock import MagicMock
 
-from lib.DataPopulateService import DataPopulateService
+from functions.lib.data_populate_service import DataPopulateService
 
 class DataPopulateServiceTest(unittest.TestCase):
     

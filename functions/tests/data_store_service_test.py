@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 import botocore.exceptions
 import json
 
-from lib.DataStoreService import DataStoreService
+from functions.lib.data_store_service import DataStoreService
 
 class DataStoreServiceTest(unittest.TestCase):
 
