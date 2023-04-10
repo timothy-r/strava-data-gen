@@ -3,11 +3,11 @@ from dependency_injector import containers, providers
 import boto3
 import logging
 
-from functions.lib.DataPopulateService import DataPopulateService
+from functions.lib.data_populate_service import DataPopulateService
 
-from .AccessTokenService import AccessTokenService
-from .StravaService import StravaService
-from .DataStoreService import DataStoreService
+from functions.lib.access_token_service import AccessTokenService
+from functions.lib.strava_service import StravaService
+from functions.lib.data_store_service import DataStoreService
 
 """
     DI container for the application

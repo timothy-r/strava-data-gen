@@ -1,7 +1,7 @@
 import requests
 import json
 
-from .AppExceptions import RequestError
+from .app_exceptions import RequestError
 from botocore.exceptions import ClientError
 
 """

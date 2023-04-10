@@ -1,7 +1,7 @@
 import requests
 
-from .AppExceptions import RequestError
-from .AccessTokenService import AccessTokenService
+from .app_exceptions import RequestError
+from .access_token_service import AccessTokenService
 
 """
     Encapsulates all interactions with Strava APIs
