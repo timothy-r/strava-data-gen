@@ -27,12 +27,12 @@ class AccessTokenServiceTest(unittest.TestCase):
         self._access_token_service = AccessTokenService(
             logger=logger_mock,
             sm=self._sm_service,
-            requests=self._requests,
             client_id=client_id,
             secret_name=self._secret_name,
             authz_url=authz_url,
             access_token_name=self._access_token_name
         )
+        self._access_token_service.set_requests(requests=self._requests)
         
         return super().setUp()
 

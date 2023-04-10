@@ -2,6 +2,7 @@ from dependency_injector import containers, providers
 
 import boto3
 import logging
+import requests
 
 from functions.lib.data_populate_service import DataPopulateService
 
@@ -52,7 +53,7 @@ class Container(containers.DeclarativeContainer):
         region=config.app_region
     )
     
-    access_token_service = providers.Factory(
+    access_token_service = providers.Singleton()(
         AccessTokenService,
         logger=logger_service,
         sm=sm_client,
@@ -62,7 +63,7 @@ class Container(containers.DeclarativeContainer):
         access_token_name=config.sm_access_token_name
     )
     
-    strava_service = providers.Factory(
+    strava_service = providers.Singleton()(
         StravaService,
         logger=logger_service,
         access_token_service=access_token_service,
@@ -94,5 +95,9 @@ def get_container():
     container.init_resources()
     
     container.logger_service().setLevel(logging.DEBUG)
+    
+    container.access_token_service().set_requests(requests=requests)
+    
+    container.strava_service().set_requests(requests=requests)
     
     return container

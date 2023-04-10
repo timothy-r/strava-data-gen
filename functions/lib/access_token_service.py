@@ -19,7 +19,6 @@ class AccessTokenService:
     def __init__(self, 
         logger,
         sm: SecretManagerService,
-        requests: requests,
         client_id:str,
         secret_name:str,
         authz_url:str,
@@ -28,7 +27,6 @@ class AccessTokenService:
         
         self._logger = logger
         self._sm = sm
-        self._requests = requests
         
         # pass in a dict?
         self._client_id = client_id
@@ -38,6 +36,9 @@ class AccessTokenService:
         
         return None
     
+    def set_requests(self, requests:requests):
+        self._requests = requests
+        
     def get_access_token(self, use_local=True) -> str:
         
         if use_local:
