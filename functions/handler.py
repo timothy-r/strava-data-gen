@@ -1,4 +1,4 @@
-from lib.Container import get_container
+from lib.container import get_container
 
 import time
 

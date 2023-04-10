@@ -1,8 +1,7 @@
-'use strict';
-
-from lib.Container import get_container
+from lib.container import get_container
 
 """
+* authorize the request - use shared secret?
 * Get all activities from Strava
 * Add all activities to data store 
 

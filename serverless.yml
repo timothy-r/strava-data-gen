@@ -8,11 +8,13 @@ custom:
   stage: ${opt:stage, self:provider.stage}
   region: ${opt:region, self:provider.region}
   
-  webBucket: www.trodger.com
+  # not used here
+  # webBucket: www.trodger.com
 
   dataStoreBucket: ${self:service}-${self:custom.stage}-activities-data-store
 
-  activitiesTopic: ${self:service}-${self:custom.stage}-activities
+  # replace with EB topic
+  # activitiesTopic: ${self:service}-${self:custom.stage}-activities
   
   pythonRequirements:
     dockerizePip: non-linux
@@ -61,19 +63,30 @@ provider:
     DATA_STORE_BUCKET: ${self:custom.dataStoreBucket}
 
 functions:
-  rateHandler:
-    timeout: 60
-    handler: functions/handler.run
-    events:
-      # Invoke Lambda function every hour - really want this between 8am & 8pm 
-      - schedule: rate(1 hour)
-  populate:
-    timeout: 60
-    handler: functions/populate.run
 
-  # reportHeartRate:
+  # subscribe endpoint completes subscription with Strava web hooks
+  subscribe:
+    handler: function/subscribe.run
+    timeout: 60
+  
+  # update endpoint is subscribed to Strava webhook and triggers getting new activities
+  update:
+    handler: function/update.run
+    timeout: 60
+
+
+  # rateHandler:
   #   timeout: 60
-  #   handler: functions/reportHeartRate.run
+  #   handler: functions/handler.run
+  #   events:
+  #     # Invoke Lambda function every hour - really want this between 8am & 8pm 
+  #     - schedule: rate(1 hour)
+  
+  populate:
+    handler: functions/populate.run
+    timeout: 60
+    
+
 
 plugins:
   - serverless-python-requirements

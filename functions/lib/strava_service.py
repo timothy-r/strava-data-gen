@@ -30,7 +30,9 @@ class StravaService:
     """
     def set_requests(self, requests:requests):
         self._requests = requests
-        
+    
+    """
+    """
     def get_activities(self, after:int) -> list:
         """
             get activities from Strava - if authZ fails then get a new access token & try again
@@ -60,6 +62,36 @@ class StravaService:
         
         return activities
 
+    """
+    """
+    def get_activity(self, id) -> dict:
+        
+        activity = None
+        
+        try:
+            # get access token (use local one if possible)
+            token = self._access_token_service.get_access_token(True)
+            activity = self._get_single_strava_activity(token, id=id)
+            
+        except RequestError as error:
+            self._logger.error("Request to get activities failed {}".format(error))
+        
+        if activity:
+            return activity
+        
+        try:
+            # get new access token & try again
+            token = self._access_token_service.get_access_token(False)
+            activity = self._get_single_strava_activity(token, id=id)
+            
+        except RequestError as error:
+            self._logger.error("Second request to get activities failed {}".format(error))
+            return None 
+        
+        return activity
+    
+    """
+    """
     def _get_strava_data(self, token: str, after=0) -> dict:
         p = 1
         results = []
@@ -74,15 +106,31 @@ class StravaService:
             
         return results
     
+    """
+    """
     def _get_paged_strava_data(self, token: str, items_per_page:int=200, page:int=1, after=0) -> dict:
         
         header = {'Authorization': 'Bearer ' + token}
         param = {'per_page': items_per_page, 'page': page, 'after': after}
         
-        response = self._requests.get(self._activities_url, headers=header, params=param)
+        return self._make_strava_request(self._activities_url, headers=header, params=param)        
+    
+    def _get_single_strava_activity(self, token, id) -> dict:
+        
+        url = "{}/{}".format(self._activities_url, id)
+        
+        header = {'Authorization': 'Bearer ' + token}
+        param = {}
+        
+        return self._make_strava_request(url, headers=header, params=param)        
+    
+    """
+    """
+    def _make_strava_request(self, url, headers, params):
+        
+        response = self._requests.get(url, headers=headers, params=params)
         
         if response.status_code == 200:
             return response.json()
         else:
             raise RequestError("Request failed: {}".format(response.status_code))
-    

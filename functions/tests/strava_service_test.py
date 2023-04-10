@@ -3,9 +3,6 @@ from unittest.mock import Mock
 from unittest.mock import MagicMock
 from unittest.mock import sentinel
 
-# from functions.lib.container import get_container
-
-from functions.lib.app_exceptions import RequestError
 from functions.lib.strava_service import StravaService
 
 class StravaServiceTest(unittest.TestCase):
@@ -86,6 +83,30 @@ class StravaServiceTest(unittest.TestCase):
         result = self._strava_service.get_activities(after=after)
         
         self.assertEqual(expected_activities, result)
+    
+    def test_get_single_activity(self):
+        id = 0
+        returned_activity = self._get_mock_activity(123)
+        
+        response_a = Mock()
+        response_a.status_code = 200
+        response_a.json = Mock(return_value=returned_activity)
+        
+        self._requests.get = MagicMock(side_effect = [response_a])
+        
+        result = self._strava_service.get_activity(id=id)
+        
+        self.assertEqual(returned_activity, result)
+    
+    def test_get_activity_failed_request(self):
+        id = 999
+        
+        response = sentinel
+        sentinel.status_code = 500
+        self._requests.get = MagicMock(return_value = response)
+        
+        result = self._strava_service.get_activity(id=id)
+        self.assertIsNone(result)
         
     def _get_mock_activity(self, id=101):
         
