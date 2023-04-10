@@ -1,8 +1,8 @@
 import requests
-import json
 
-from .app_exceptions import RequestError
-from botocore.exceptions import ClientError
+from functions.lib.secret_manager_service import SecretManagerService
+from functions.lib.app_exceptions import RequestError
+
 
 """
     Provides OAuth access tokens
@@ -16,20 +16,32 @@ class AccessTokenService:
     
     """
     """
-    def __init__(self, logger, sm, client_id:str, secret_name:str, authz_url:str, access_token_name:str) -> None:
+    def __init__(self, 
+        logger,
+        sm: SecretManagerService,
+        requests: requests,
+        client_id:str,
+        secret_name:str,
+        authz_url:str,
+        access_token_name:str
+    ) -> None:
         
         self._logger = logger
         self._sm = sm
+        self._requests = requests
+        
+        # pass in a dict?
         self._client_id = client_id
         self._secret_name = secret_name
         self._authz_url = authz_url
         self._access_token_name = access_token_name
+        
         return None
     
-    def get_access_token(self, useLocal=True) -> str:
+    def get_access_token(self, use_local=True) -> str:
         
-        if useLocal:
-            token_data = self._get_secrets(self._access_token_name)
+        if use_local:
+            token_data = self._sm.get_by_id(self._access_token_name)
             if token_data:
                 self._logger.info("Using local token")
                 return token_data['token']
@@ -40,40 +52,17 @@ class AccessTokenService:
         # only store the token if it exists, on failure store nothing
         if token:
             self._logger.info("Got new token")
-            self._set_stored_access_token({'token': token})
+            self._sm.put_by_id(self._access_token_name, {'token': token})
             return token 
         else:
             return None
         
-    
-    def _set_stored_access_token(self, token_data:dict) -> bool:
-        data = json.dumps(token_data)
-        try:
-            return self._sm.put_secret_value(SecretId=self._access_token_name, SecretString=data)
-        except ClientError as err:
-            self._logger.error("Failed to set access token in SM {}".format(err))
-            # create a new secret
-            return self._sm.create_secret(Name=self._access_token_name, SecretString=data)
-    
-    def _get_secrets(self, name:str) -> dict:
-        # should be in JSON format, convert here
-        try:
-            secrets_data = self._sm.get_secret_value(SecretId=name)
-            if 'SecretString' in secrets_data:
-                return json.loads(secrets_data['SecretString'])
-            else:
-                self._logger.error("SecretString not set")
-                return None
-            
-        except ClientError as err:
-            self._logger.error("Failed to get secrets '{}' from SM - error: {}".format(name, err))
-            return None 
-    
     """ 
         Get an access token from Strava API
     """
     def _request_access_token(self) -> str:
-        secrets = self._get_secrets(self._secret_name)
+        
+        secrets = self._sm.get_by_id(self._secret_name)
         
         # test if secrets is set 
         if not secrets:
@@ -88,7 +77,7 @@ class AccessTokenService:
             'f': 'json'
         }
         
-        response = requests.post(
+        response = self._requests.post(
             self._authz_url,
             data=payload, 
             verify=True

@@ -8,6 +8,7 @@ from functions.lib.data_populate_service import DataPopulateService
 from functions.lib.access_token_service import AccessTokenService
 from functions.lib.strava_service import StravaService
 from functions.lib.data_store_service import DataStoreService
+from functions.lib.secret_manager_service import SecretManagerService
 
 """
     DI container for the application
@@ -25,6 +26,12 @@ class Container(containers.DeclarativeContainer):
     logger_service = providers.Callable(
         logging.getLogger,
         __name__
+    )
+    
+    sm_service = providers.Factory(
+        SecretManagerService,
+        sm_client,
+        logger_service
     )
     
     s3_client = providers.Singleton(
